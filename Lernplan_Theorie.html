@@ -6,27 +6,30 @@
 <title>PPL Theorie-Lernplan</title>
 <style>
   :root {
-    --bg: #fafaf8;
-    --ink: #1a1a1a;
-    --ink-soft: #555;
-    --ink-faint: #888;
-    --line: #d8d8d4;
+    /* Notion-Dark Theme */
+    --bg: #191919;
+    --surface: #252525;
+    --surface-2: #2f2f2f;
+    --ink: #e8e8e8;
+    --ink-soft: #a0a0a0;
+    --ink-faint: #6e6e6e;
+    --line: #353535;
 
-    /* Phasen — klar getrennt, hoher Kontrast */
-    --p1-bg: #d4e7c5;       /* Phase 1 — Initial: grün */
-    --p1-ink: #2d4a1e;
-    --p1-accent: #4a7c2a;
+    /* Phasen — gesättigt aber gedimmt für Dark-Mode */
+    --p1-bg: #2d4a26;       /* Phase 1 — grün */
+    --p1-ink: #c5e0b8;
+    --p1-accent: #7ab85c;
 
-    --p2-bg: #fbd9a8;       /* Phase 2 — Wiederholung: orange */
-    --p2-ink: #6b3410;
-    --p2-accent: #c4791a;
+    --p2-bg: #5a3a1c;       /* Phase 2 — orange */
+    --p2-ink: #f4cc9c;
+    --p2-accent: #e09040;
 
-    --p3-bg: #f5b8b3;       /* Phase 3 — Endspurt: rot */
-    --p3-ink: #5a1414;
-    --p3-accent: #a8281f;
+    --p3-bg: #5e2424;       /* Phase 3 — rot */
+    --p3-ink: #f0b0ad;
+    --p3-accent: #d65050;
 
-    --exam-bg: #1a1a1a;
-    --exam-ink: #ffffff;
+    --exam-bg: #ffffff;     /* invertiert: weiß auf dunkel */
+    --exam-ink: #1a1a1a;
   }
   * { box-sizing: border-box; }
   body {
@@ -63,7 +66,7 @@
   .progress-track {
     flex: 1;
     height: 8px;
-    background: #e5e5e0;
+    background: var(--surface-2);
     border-radius: 4px;
     overflow: hidden;
   }
@@ -72,9 +75,9 @@
     background: var(--ink);
     transition: width 0.3s;
   }
-  .progress strong { font-weight: 600; }
+  .progress strong { font-weight: 600; color: var(--ink); }
   .progress button {
-    background: white;
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 5px;
     padding: 4px 10px;
@@ -82,11 +85,11 @@
     font-size: 12px;
     color: var(--ink-soft);
   }
-  .progress button:hover { background: var(--bg); }
+  .progress button:hover { background: var(--surface-2); color: var(--ink); }
 
   /* KALENDER GRID */
   .cal {
-    background: white;
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 10px;
     overflow: hidden;
@@ -94,7 +97,7 @@
   .cal-head {
     display: grid;
     grid-template-columns: 70px repeat(7, 1fr);
-    background: #f0f0eb;
+    background: var(--surface-2);
     border-bottom: 1px solid var(--line);
   }
   .cal-head > div {
@@ -113,7 +116,7 @@
   .cal-row + .cal-row { border-top: 1px solid var(--line); }
   .cal-week {
     padding: 10px 8px;
-    background: #f0f0eb;
+    background: var(--surface-2);
     font-size: 11px;
     color: var(--ink-soft);
     text-transform: uppercase;
@@ -138,8 +141,8 @@
     gap: 6px;
   }
   .cell:last-child { border-right: none; }
-  .cell:hover:not(.empty) { filter: brightness(0.97); }
-  .cell.empty { background: #fafaf6; cursor: default; }
+  .cell:hover:not(.empty) { filter: brightness(1.15); }
+  .cell.empty { background: var(--surface-2); cursor: default; }
 
   /* Phase Backgrounds */
   .cell.p1 { background: var(--p1-bg); color: var(--p1-ink); }
@@ -174,7 +177,7 @@
     opacity: 0.6;
   }
   .cell.done {
-    filter: opacity(0.45) saturate(0.4);
+    filter: opacity(0.35) saturate(0.3);
   }
   .cell.done .topic { text-decoration: line-through; }
 
