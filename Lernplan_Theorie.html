@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPL Theorie-Lernplan</title>
+<style>
+  :root {
+    --bg: #fafaf8;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-faint: #888;
+    --line: #d8d8d4;
+
+    /* Phasen — klar getrennt, hoher Kontrast */
+    --p1-bg: #d4e7c5;       /* Phase 1 — Initial: grün */
+    --p1-ink: #2d4a1e;
+    --p1-accent: #4a7c2a;
+
+    --p2-bg: #fbd9a8;       /* Phase 2 — Wiederholung: orange */
+    --p2-ink: #6b3410;
+    --p2-accent: #c4791a;
+
+    --p3-bg: #f5b8b3;       /* Phase 3 — Endspurt: rot */
+    --p3-ink: #5a1414;
+    --p3-accent: #a8281f;
+
+    --exam-bg: #1a1a1a;
+    --exam-ink: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 40px 24px 80px;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  /* HEADER */
+  h1 {
+    font-size: 32px;
+    margin: 0 0 4px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .meta {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0 0 24px;
+  }
+  .meta span + span::before { content: "·"; margin: 0 8px; color: var(--ink-faint); }
+
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 28px;
+    font-size: 14px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    background: #e5e5e0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--ink);
+    transition: width 0.3s;
+  }
+  .progress strong { font-weight: 600; }
+  .progress button {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .progress button:hover { background: var(--bg); }
+
+  /* KALENDER GRID */
+  .cal {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cal-head {
+    display: grid;
+    grid-template-columns: 70px repeat(7, 1fr);
+    background: #f0f0eb;
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-head > div {
+    padding: 10px 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    text-align: center;
+  }
+  .cal-row {
+    display: grid;
+    grid-template-columns: 70px repeat(7, 1fr);
+  }
+  .cal-row + .cal-row { border-top: 1px solid var(--line); }
+  .cal-week {
+    padding: 10px 8px;
+    background: #f0f0eb;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-right: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+  .cell {
+    padding: 10px 10px 12px;
+    border-right: 1px solid var(--line);
+    min-height: 120px;
+    position: relative;
+    cursor: pointer;
+    transition: filter 0.12s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cell:last-child { border-right: none; }
+  .cell:hover:not(.empty) { filter: brightness(0.97); }
+  .cell.empty { background: #fafaf6; cursor: default; }
+
+  /* Phase Backgrounds */
+  .cell.p1 { background: var(--p1-bg); color: var(--p1-ink); }
+  .cell.p2 { background: var(--p2-bg); color: var(--p2-ink); }
+  .cell.p3 { background: var(--p3-bg); color: var(--p3-ink); }
+  .cell.exam { background: var(--exam-bg); color: var(--exam-ink); }
+
+  .cell .date {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .cell .topic {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .cell .info {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-top: auto;
+    font-weight: 500;
+  }
+  .cell .phase-tag {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+  }
+  .cell.done {
+    filter: opacity(0.45) saturate(0.4);
+  }
+  .cell.done .topic { text-decoration: line-through; }
+
+  .cell.exam .date { font-size: 20px; }
+  .cell.exam .topic { font-size: 14px; font-weight: 800; letter-spacing: 0.02em; }
+
+  /* LEGENDE */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .lg-p1 { background: var(--p1-bg); color: var(--p1-ink); }
+  .lg-p2 { background: var(--p2-bg); color: var(--p2-ink); }
+  .lg-p3 { background: var(--p3-bg); color: var(--p3-ink); }
+  .lg-ex { background: var(--exam-bg); color: var(--exam-ink); }
+
+  /* HINT */
+  .hint {
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
+  @media (max-width: 800px) {
+    body { padding: 20px 12px 60px; }
+    h1 { font-size: 22px; }
+    .cal-head, .cal-row { grid-template-columns: 36px repeat(7, 1fr); }
+    .cal-head > div, .cal-week { font-size: 9px; padding: 6px 2px; }
+    .cell { padding: 6px 5px 8px; min-height: 90px; gap: 3px; }
+    .cell .date { font-size: 14px; }
+    .cell .topic { font-size: 10px; }
+    .cell .info { font-size: 9px; }
+    .cell .phase-tag { display: none; }
+  }
+
+  @media print {
+    body { background: white; padding: 16px; }
+    .progress { display: none; }
+    .cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>PPL Theorie-Lernplan</h1>
+  <p class="meta">
+    <span>25. Mai – 20. Juni 2026</span>
+    <span>26 Lerntage</span>
+    <span>2509 Karten</span>
+    <span>9 Fächer · 2,5 h/Tag</span>
+  </p>
+
+  <div class="progress">
+    <strong id="progress-text">0 / 26 Tage</strong>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <span id="days-left">—</span>
+    <button onclick="resetProgress()">Reset</button>
+  </div>
+
+  <div class="cal">
+    <div class="cal-head">
+      <div>Woche</div>
+      <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+    </div>
+
+    <!-- W1 -->
+    <div class="cal-row">
+      <div class="cal-week">W1<br>25.–31. Mai</div>
+      <div class="cell p1" data-id="d01"><span class="phase-tag">P1</span><div class="date">25</div><div class="topic">Luftrecht 1/2</div><div class="info">126 Karten</div></div>
+      <div class="cell p1" data-id="d02"><span class="phase-tag">P1</span><div class="date">26</div><div class="topic">Luftrecht 2/2</div><div class="info">126 Karten</div></div>
+      <div class="cell p1" data-id="d03"><span class="phase-tag">P1</span><div class="date">27</div><div class="topic">Grundlagen 1/2</div><div class="info">117 Karten</div></div>
+      <div class="cell p1" data-id="d04"><span class="phase-tag">P1</span><div class="date">28</div><div class="topic">Grundlagen 2/2</div><div class="info">116 Karten</div></div>
+      <div class="cell p1" data-id="d05"><span class="phase-tag">P1</span><div class="date">29</div><div class="topic">AL-Kunde 1/3</div><div class="info">121 Karten</div></div>
+      <div class="cell p1" data-id="d06"><span class="phase-tag">P1</span><div class="date">30</div><div class="topic">AL-Kunde 2/3</div><div class="info">121 Karten</div></div>
+      <div class="cell p1" data-id="d07"><span class="phase-tag">P1</span><div class="date">31</div><div class="topic">AL-Kunde 3/3</div><div class="info">122 Karten</div></div>
+    </div>
+
+    <!-- W2 -->
+    <div class="cal-row">
+      <div class="cal-week">W2<br>1.–7. Juni</div>
+      <div class="cell p1" data-id="d08"><span class="phase-tag">P1</span><div class="date">1</div><div class="topic">MenLei 1/2</div><div class="info">107 Karten</div></div>
+      <div class="cell p1" data-id="d09"><span class="phase-tag">P1</span><div class="date">2</div><div class="topic">MenLei 2/2</div><div class="info">107 Karten</div></div>
+      <div class="cell p1" data-id="d10"><span class="phase-tag">P1</span><div class="date">3</div><div class="topic">Meteo 1/3</div><div class="info">145 Karten</div></div>
+      <div class="cell p1" data-id="d11"><span class="phase-tag">P1</span><div class="date">4</div><div class="topic">Meteo 2/3</div><div class="info">145 Karten</div></div>
+      <div class="cell p1" data-id="d12"><span class="phase-tag">P1</span><div class="date">5</div><div class="topic">Meteo 3/3</div><div class="info">146 Karten</div></div>
+      <div class="cell p1" data-id="d13"><span class="phase-tag">P1</span><div class="date">6</div><div class="topic">Navigation 1/3</div><div class="info">153 Karten</div></div>
+      <div class="cell p1" data-id="d14"><span class="phase-tag">P1</span><div class="date">7</div><div class="topic">Navigation 2/3</div><div class="info">154 Karten</div></div>
+    </div>
+
+    <!-- W3 -->
+    <div class="cal-row">
+      <div class="cal-week">W3<br>8.–14. Juni</div>
+      <div class="cell p1" data-id="d15"><span class="phase-tag">P1</span><div class="date">8</div><div class="topic">Navigation 3/3</div><div class="info">154 Karten</div></div>
+      <div class="cell p1" data-id="d16"><span class="phase-tag">P1</span><div class="date">9</div><div class="topic">Flugplanung</div><div class="info">161 Karten</div></div>
+      <div class="cell p1" data-id="d17"><span class="phase-tag">P1</span><div class="date">10</div><div class="topic">BetrVerf 1/2</div><div class="info">91 Karten</div></div>
+      <div class="cell p1" data-id="d18"><span class="phase-tag">P1</span><div class="date">11</div><div class="topic">BetrVerf 2/2</div><div class="info">92 Karten</div></div>
+      <div class="cell p1" data-id="d19"><span class="phase-tag">P1</span><div class="date">12</div><div class="topic">Sprechfunk</div><div class="info">205 Karten</div></div>
+      <div class="cell p2" data-id="d20"><span class="phase-tag">P2</span><div class="date">13</div><div class="topic">Wdh. A</div><div class="info">Luftr. + Grundl.</div></div>
+      <div class="cell p2" data-id="d21"><span class="phase-tag">P2</span><div class="date">14</div><div class="topic">Wdh. B</div><div class="info">AL-K. + MenLei</div></div>
+    </div>
+
+    <!-- W4 -->
+    <div class="cal-row">
+      <div class="cal-week">W4<br>15.–20. Juni</div>
+      <div class="cell p2" data-id="d22"><span class="phase-tag">P2</span><div class="date">15</div><div class="topic">Wdh. C</div><div class="info">Meteo komplett</div></div>
+      <div class="cell p2" data-id="d23"><span class="phase-tag">P2</span><div class="date">16</div><div class="topic">Wdh. D</div><div class="info">Navi + Flugplng.</div></div>
+      <div class="cell p3" data-id="d24"><span class="phase-tag">P3</span><div class="date">17</div><div class="topic">Wdh. E + Mock</div><div class="info">BetrV. + Sprechf.</div></div>
+      <div class="cell p3" data-id="d25"><span class="phase-tag">P3</span><div class="date">18</div><div class="topic">Mock-Tests</div><div class="info">2–3 Übungsprüf.</div></div>
+      <div class="cell p3" data-id="d26"><span class="phase-tag">P3</span><div class="date">19</div><div class="topic">Light Day</div><div class="info">Schwächen · 1–2 h</div></div>
+      <div class="cell exam"><div class="date">20</div><div class="topic">PRÜFUNG</div><div class="info">Theorieprüfung</div></div>
+      <div class="cell empty"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item lg-p1">Phase 1 — Initial (19 Tage)</span>
+    <span class="legend-item lg-p2">Phase 2 — Wiederholung (4 Tage)</span>
+    <span class="legend-item lg-p3">Phase 3 — Endspurt (3 Tage)</span>
+    <span class="legend-item lg-ex">Prüfung</span>
+  </div>
+
+  <div class="hint">Klick auf eine Zelle markiert sie als erledigt · Fortschritt wird im Browser gespeichert</div>
+
+</div>
+
+<script>
+  const STORAGE_KEY = "ppl_lernplan_2026_progress";
+  const TOTAL_DAYS = 26;
+  const EXAM_DATE = new Date("2026-06-20T08:00:00");
+
+  function loadProgress() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function saveProgress(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+  function init() {
+    const state = loadProgress();
+    document.querySelectorAll('.cell[data-id]').forEach(cell => {
+      const id = cell.dataset.id;
+      if (state[id]) cell.classList.add("done");
+      cell.addEventListener("click", () => {
+        const s = loadProgress();
+        s[id] = !s[id];
+        saveProgress(s);
+        cell.classList.toggle("done", s[id]);
+        updateProgress();
+      });
+    });
+  }
+
+  function updateProgress() {
+    const state = loadProgress();
+    const done = Object.values(state).filter(Boolean).length;
+    document.getElementById("progress-fill").style.width = (done / TOTAL_DAYS * 100) + "%";
+    document.getElementById("progress-text").textContent = done + " / " + TOTAL_DAYS + " Tage";
+  }
+
+  function updateDaysLeft() {
+    const diff = Math.ceil((EXAM_DATE - new Date()) / (1000 * 60 * 60 * 24));
+    document.getElementById("days-left").textContent = diff > 0 ? diff + " Tage bis Prüfung" : (diff === 0 ? "Prüfung heute" : "Prüfung vorbei");
+  }
+
+  function resetProgress() {
+    if (!confirm("Wirklich allen Fortschritt zurücksetzen?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('.cell.done').forEach(c => c.classList.remove("done"));
+    updateProgress();
+  }
+
+  init();
+  updateProgress();
+  updateDaysLeft();
+</script>
+
+</body>
+</html>
